@@ -23,18 +23,8 @@ func init() {
 
 func main() {
 	defer save()
-	http.HandleFunc("/", route)
+	http.HandleFunc("/", handleRoutes)
 	log.Fatal(http.ListenAndServe(":4646", nil))
-}
-
-func route(w http.ResponseWriter, r *http.Request) {
-	split := strings.Split(r.URL.Path, "/")
-	route := split[len(split)-1]
-	if _, ok := routes[route]; ok {
-		http.Redirect(w, r, routes[route], http.StatusTemporaryRedirect)
-	} else {
-		http.Error(w, http.StatusText(404), 404)
-	}
 }
 
 func save() {
