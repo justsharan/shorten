@@ -1,18 +1,23 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
 	"strings"
+	"sync/atomic"
 	"time"
 )
 
-var httpLogger *log.Logger
-
-var routes = make(map[string]string)
+var (
+	healthy    int32
+	httpLogger *log.Logger
+	routes     map[string]string
+)
 
 func init() {
 	bytes, err := ioutil.ReadFile("routes.txt")
@@ -20,21 +25,19 @@ func init() {
 		log.Fatal(err)
 	}
 
+	routes = make(map[string]string)
 	for _, line := range strings.Split(string(bytes), "\n") {
 		res := strings.Split(line, " ")
-		routes[res[0]] = res[1]
+		if len(res) > 1 {
+			routes[res[0]] = res[1]
+		}
 	}
 }
 
 func main() {
-	defer save()
-
 	var port string
 	flag.StringVar(&port, "port", "4646", "server port")
 	flag.Parse()
-
-	httpLogger = log.New(os.Stdout, "http: ", log.LstdFlags)
-	httpLogger.Printf("Server is starting on port %s\n", port)
 
 	router := http.NewServeMux()
 	router.HandleFunc("/", handleRoutes)
@@ -48,13 +51,42 @@ func main() {
 		IdleTimeout:  14 * time.Second,
 	}
 
-	server.ListenAndServe()
+	done := make(chan bool)
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt)
+
+	go func() {
+		<-quit
+		httpLogger.Println("Server is shutting down")
+		atomic.StoreInt32(&healthy, 0)
+
+		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		server.SetKeepAlivesEnabled(false)
+		if err := server.Shutdown(ctx); err != nil {
+			httpLogger.Fatal(err)
+		}
+
+		close(done)
+	}()
+
+	httpLogger = log.New(os.Stdout, "http: ", log.LstdFlags)
+	httpLogger.Printf("Server is starting on port %s\n", port)
+
+	atomic.StoreInt32(&healthy, 1)
+	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatal(err)
+	}
+
+	<-done
+	save()
 }
 
 func save() {
 	var content string
 	for k, v := range routes {
-		content += k + " " + v
+		content += k + " " + v + "\n"
 	}
 	ioutil.WriteFile("routes.txt", []byte(content), 0466)
 }
