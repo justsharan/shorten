@@ -7,7 +7,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [darwin, linux]
+        os: [darwin, linux, windows]
         arch: [amd64, 386]
     runs-on: ubuntu-latest
     steps:
@@ -15,8 +15,12 @@ jobs:
         uses: actions/checkout@v2
       - name: Setup Golang
         uses: actions/setup-go@v2
-      - name: Build project
+      - name: Build executable
+        if: matrix.os != "windows"
         run: GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o bin/${{ matrix.os }}-${{ matrix.arch }}
+      - name: Build Windows executable
+        if: matrix.os == "windows"
+        run: GOOS=windows GOARCH=${{ matrix.arch }} go build -o bin/windows-${{ matrix.arch }}.exe
       - name: Upload artifact
         uses: actions/upload-artifact@v2
         with:
