@@ -6,22 +6,21 @@ import (
 	"strings"
 )
 
-func handleRoutes(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "GET":
-		http.HandlerFunc(getRoute).ServeHTTP(w, r)
-	case "POST":
-		http.HandlerFunc(postRoute).ServeHTTP(w, r)
-	case "DELETE":
-		http.HandlerFunc(deleteRoute).ServeHTTP(w, r)
-	}
+var routes = map[string]func(w http.ResponseWriter, r *http.Request){
+	"GET":    getRoute,
+	"POST":   postRoute,
+	"DELETE": deleteRoute,
 }
+
+var handleRoutes = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	http.HandlerFunc(routes[r.Method]).ServeHTTP(w, r)
+})
 
 func getRoute(w http.ResponseWriter, r *http.Request) {
 	split := strings.Split(r.URL.Path, "/")
 	route := split[len(split)-1]
-	if _, ok := routes[route]; ok {
-		http.Redirect(w, r, routes[route], http.StatusTemporaryRedirect)
+	if _, ok := urls[route]; ok {
+		http.Redirect(w, r, urls[route], http.StatusTemporaryRedirect)
 	} else {
 		http.Error(w, http.StatusText(404), 404)
 	}
@@ -37,11 +36,11 @@ func postRoute(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	routes[split[len(split)-1]] = string(bytes)
+	urls[split[len(split)-1]] = string(bytes)
 	w.Write([]byte("https://" + r.Host + "/" + split[len(split)-1] + "\n"))
 }
 
 func deleteRoute(w http.ResponseWriter, r *http.Request) {
 	split := strings.Split(r.URL.Path, "/")
-	delete(routes, split[len(split)-1])
+	delete(urls, split[len(split)-1])
 }

@@ -10,11 +10,11 @@ import (
 	"time"
 )
 
-var routes map[string]string
+var urls map[string]string
 
 func init() {
-	routes = make(map[string]string)
-	if err := readFile("routes.txt", &routes); err != nil {
+	urls = make(map[string]string)
+	if err := readFile("routes.txt", &urls); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -24,12 +24,9 @@ func main() {
 	flag.StringVar(&port, "port", "4646", "server port")
 	flag.Parse()
 
-	router := http.NewServeMux()
-	router.HandleFunc("/", handleRoutes)
-
 	server := &http.Server{
 		Addr:         ":" + port,
-		Handler:      logger(router),
+		Handler:      logger(handleRoutes),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  14 * time.Second,
@@ -60,5 +57,5 @@ func main() {
 	}
 
 	<-done
-	saveFile("routes.txt", &routes)
+	saveFile("routes.txt", &urls)
 }
