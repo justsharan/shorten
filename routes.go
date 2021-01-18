@@ -6,14 +6,15 @@ import (
 	"strings"
 )
 
-var routes = map[string]func(w http.ResponseWriter, r *http.Request){
-	"GET":    getRoute,
-	"POST":   postRoute,
-	"DELETE": deleteRoute,
-}
-
 var handleRoutes = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-	http.HandlerFunc(routes[r.Method]).ServeHTTP(w, r)
+	switch r.Method {
+	case "GET":
+		getRoute(w, r)
+	case "POST":
+		auth(postRoute).ServeHTTP(w, r)
+	case "DELETE":
+		auth(deleteRoute).ServeHTTP(w, r)
+	}
 })
 
 func getRoute(w http.ResponseWriter, r *http.Request) {

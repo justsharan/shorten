@@ -2,7 +2,9 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -11,12 +13,16 @@ import (
 )
 
 var urls map[string]string
+var token string
 
 func init() {
 	urls = make(map[string]string)
 	if err := readFile("routes.txt", &urls); err != nil {
 		log.Fatal(err)
 	}
+
+	token = randomString()
+	log.Printf("Your token is %s\n", token)
 }
 
 func main() {
@@ -58,4 +64,10 @@ func main() {
 
 	<-done
 	saveFile("routes.txt", &urls)
+}
+
+func randomString() string {
+	b := make([]byte, 10)
+	rand.Read(b)
+	return fmt.Sprintf("%X", b)
 }
