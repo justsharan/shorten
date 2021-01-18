@@ -22,6 +22,7 @@ func init() {
 }
 
 func main() {
+	defer save()
 	http.HandleFunc("/", route)
 	log.Fatal(http.ListenAndServe(":4646", nil))
 }
@@ -34,4 +35,12 @@ func route(w http.ResponseWriter, r *http.Request) {
 	} else {
 		http.Error(w, http.StatusText(404), 404)
 	}
+}
+
+func save() {
+	var content string
+	for k, v := range routes {
+		content += k + " " + v
+	}
+	ioutil.WriteFile("routes.txt", []byte(content), 0466)
 }
