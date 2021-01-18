@@ -5,7 +5,9 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
+	"time"
 )
 
 var routes = make(map[string]string)
@@ -29,8 +31,22 @@ func main() {
 	flag.StringVar(&port, "port", "4646", "server port")
 	flag.Parse()
 
-	http.HandleFunc("/", handleRoutes)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
+	logger.Println("Server is starting...")
+
+	router := http.NewServeMux()
+	router.HandleFunc("/", handleRoutes)
+
+	server := &http.Server{
+		Addr:         ":" + port,
+		Handler:      router,
+		ErrorLog:     logger,
+		ReadTimeout:  5 * time.Second,
+		WriteTimeout: 10 * time.Second,
+		IdleTimeout:  14 * time.Second,
+	}
+
+	server.ListenAndServe()
 }
 
 func save() {
