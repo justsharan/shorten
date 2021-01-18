@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var httpLogger *log.Logger
+
 var routes = make(map[string]string)
 
 func init() {
@@ -31,16 +33,16 @@ func main() {
 	flag.StringVar(&port, "port", "4646", "server port")
 	flag.Parse()
 
-	logger := log.New(os.Stdout, "http: ", log.LstdFlags)
-	logger.Println("Server is starting...")
+	httpLogger = log.New(os.Stdout, "http: ", log.LstdFlags)
+	httpLogger.Printf("Server is starting on port %s\n", port)
 
 	router := http.NewServeMux()
 	router.HandleFunc("/", handleRoutes)
 
 	server := &http.Server{
 		Addr:         ":" + port,
-		Handler:      router,
-		ErrorLog:     logger,
+		Handler:      logger(router),
+		ErrorLog:     httpLogger,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  14 * time.Second,
