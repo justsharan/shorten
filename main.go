@@ -14,9 +14,8 @@ import (
 )
 
 var (
-	healthy    int32
-	httpLogger *log.Logger
-	routes     map[string]string
+	healthy int32
+	routes  map[string]string
 )
 
 func init() {
@@ -45,7 +44,6 @@ func main() {
 	server := &http.Server{
 		Addr:         ":" + port,
 		Handler:      logger(router),
-		ErrorLog:     httpLogger,
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  14 * time.Second,
@@ -57,7 +55,7 @@ func main() {
 
 	go func() {
 		<-quit
-		httpLogger.Println("Server is shutting down")
+		log.Println("Server is shutting down")
 		atomic.StoreInt32(&healthy, 0)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -65,15 +63,13 @@ func main() {
 
 		server.SetKeepAlivesEnabled(false)
 		if err := server.Shutdown(ctx); err != nil {
-			httpLogger.Fatal(err)
+			log.Fatal(err)
 		}
 
 		close(done)
 	}()
 
-	httpLogger = log.New(os.Stdout, "http: ", log.LstdFlags)
-	httpLogger.Printf("Server is starting on port %s\n", port)
-
+	log.Printf("Server is starting on port %s\n", port)
 	atomic.StoreInt32(&healthy, 1)
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatal(err)
