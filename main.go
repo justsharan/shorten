@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -23,8 +24,13 @@ func init() {
 
 func main() {
 	defer save()
+
+	var port string
+	flag.StringVar(&port, "port", "4646", "server port")
+	flag.Parse()
+
 	http.HandleFunc("/", handleRoutes)
-	log.Fatal(http.ListenAndServe(":4646", nil))
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 
 func save() {
