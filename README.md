@@ -9,6 +9,8 @@ Shorten is a tiny, speedy URL shortener written in pure Go, using just the stand
     * `POST /:key`: Create a new shortened URL with that key.
 * `DELETE /:key`: Delete the URL with that key.
 
+`POST` requests are treated as upserts. If you `POST` to a pre-existing URL, that key will simply be updated. This is simpler than having separate `POST` and `PUT` endpoints for adding and updating keys.
+
 #### Installation
 1. Install Go ([Directions](https://golang.org/doc/install)).
 2. Clone the repository.
