@@ -1,30 +1,23 @@
 package main
 
 import (
-	"bufio"
+	"io/ioutil"
 	"log"
 	"net/http"
-	"os"
 	"strings"
 )
 
 var routes = make(map[string]string)
 
 func init() {
-	file, err := os.Open("routes.txt")
+	bytes, err := ioutil.ReadFile("routes.txt")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer file.Close()
 
-	scanner := bufio.NewScanner(file)
-	for scanner.Scan() {
-		res := strings.Split(scanner.Text(), " ")
+	for _, line := range strings.Split(string(bytes), "\n") {
+		res := strings.Split(line, " ")
 		routes[res[0]] = res[1]
-	}
-
-	if err = scanner.Err(); err != nil {
-		log.Fatal(err)
 	}
 }
 
