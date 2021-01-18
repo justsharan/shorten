@@ -3,33 +3,19 @@ package main
 import (
 	"context"
 	"flag"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"strings"
-	"sync/atomic"
 	"time"
 )
 
-var (
-	healthy int32
-	routes  map[string]string
-)
+var routes map[string]string
 
 func init() {
-	bytes, err := ioutil.ReadFile("routes.txt")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	routes = make(map[string]string)
-	for _, line := range strings.Split(string(bytes), "\n") {
-		res := strings.Split(line, " ")
-		if len(res) > 1 {
-			routes[res[0]] = res[1]
-		}
+	if err := readFile("routes.txt", &routes); err != nil {
+		log.Fatal(err)
 	}
 }
 
@@ -56,7 +42,6 @@ func main() {
 	go func() {
 		<-quit
 		log.Println("Server is shutting down")
-		atomic.StoreInt32(&healthy, 0)
 
 		ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
@@ -70,19 +55,10 @@ func main() {
 	}()
 
 	log.Printf("Server is starting on port %s\n", port)
-	atomic.StoreInt32(&healthy, 1)
 	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 		log.Fatal(err)
 	}
 
 	<-done
-	save()
-}
-
-func save() {
-	var content string
-	for k, v := range routes {
-		content += k + " " + v + "\n"
-	}
-	ioutil.WriteFile("routes.txt", []byte(content), 0466)
+	saveFile("routes.txt", &routes)
 }
