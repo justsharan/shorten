@@ -9,7 +9,11 @@ import (
 var handleRoutes = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "GET":
-		getRoute(w, r)
+		if r.URL.Path == "/" {
+			w.Write([]byte("Hello World\n"))
+		} else {
+			getRoute(w, r)
+		}
 	case "POST":
 		auth(postRoute).ServeHTTP(w, r)
 	case "DELETE":
