@@ -1,0 +1,24 @@
+name: Workflow
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [darwin, linux]
+        arch: [amd64, 386]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Setup Golang
+        uses: actions/setup-go@v2
+      - name: Build project
+        run: GOOS=${{ matrix.os }} GOARCH=${{ matrix.arch }} go build -o bin/${{ matrix.os }}-${{ matrix.arch }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.os }}-${{ matrix.arch }}
+          path: bin/${{ matrix.os }}-${{ matrix.arch }}
