@@ -22,7 +22,14 @@ jobs:
         if: ${{ matrix.os == 'windows' }}
         run: GOOS=windows GOARCH=${{ matrix.arch }} go build -o bin/windows-${{ matrix.arch }}.exe
       - name: Upload artifact
+        if: ${{ matrix.os != 'windows' }}
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.os }}-${{ matrix.arch }}
           path: bin/${{ matrix.os }}-${{ matrix.arch }}
+      - name: Upload Windows artifact
+        if: ${{ matrix.os == 'windows' }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.os }}-${{ matrix.arch }}.exe
+          path: bin/${{ matrix.os }}-${{ matrix.arch }}.exe
