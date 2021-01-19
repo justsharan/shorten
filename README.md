@@ -12,13 +12,13 @@ Shorten is a tiny, speedy URL shortener written in pure Go, using just the stand
 `POST` requests are treated as upserts. If you `POST` to a pre-existing URL, that key will simply be updated. This is simpler than having separate `POST` and `PUT` endpoints for adding and updating keys.
 
 #### Installation
+It is recommended to use pre-built binaries found in the artifacts. However, you _can_ follow these directions to build from source if you prefer:
+
 1. Install Go ([Directions](https://golang.org/doc/install)).
 2. Clone the repository.
 3. Install the dependencies using `go mod install`.
 4. Build the project using `go build`.
 5. Execute the go binary.
-
-Optionally, you may choose to use the pre-built binaries that you can find in the artifacts.
 
 #### Usage
 When the program starts up, it'll give you an auth token to use for `POST` and `DELETE` endpoints. Be sure to save this in a safe place. A new one will be generated each time the program restarts. Here's an example using my own instance:
