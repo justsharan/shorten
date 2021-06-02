@@ -1,7 +1,7 @@
 # shorten
 Shorten is a tiny, speedy URL shortener written in pure Go, using just the standard library and no outside modules whatsoever. It stores the list of sites in a file called `routes.txt` and serves them.
 
-#### API
+### API
 * `GET`
     * `GET /`: Simple Hello World check to see if the program is online.
     * `GET /:key`: Go to the URL with that key.
@@ -11,7 +11,7 @@ Shorten is a tiny, speedy URL shortener written in pure Go, using just the stand
 
 `POST` requests are treated as upserts. If you `POST` to a pre-existing URL, that key will simply be updated. This is simpler than having separate `POST` and `PUT` endpoints for adding and updating keys.
 
-#### Installation
+### Installation
 It is recommended to use pre-built binaries found in the artifacts. However, you _can_ follow these directions to build from source if you prefer:
 
 1. Install Go ([Directions](https://golang.org/doc/install)).
@@ -20,7 +20,7 @@ It is recommended to use pre-built binaries found in the artifacts. However, you
 4. Build the project using `go build`.
 5. Execute the go binary.
 
-#### Usage
+### Usage
 When the program starts up, it'll give you an auth token to use for `POST` and `DELETE` endpoints. Be sure to save this in a safe place. A new one will be generated each time the program restarts. Here's an example using my own instance:
 
 ```sh
@@ -33,3 +33,6 @@ $ curl -X POST cybg.cf/nyt \
 $ curl -X DELETE cybg.cf/nyt \
        -H "Authorization: AUTH_TOKEN_HERE"
 ```
+
+### License
+shorten is released under the [GNU GPL v3](./LICENSE) license.  
