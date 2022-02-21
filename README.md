@@ -4,13 +4,7 @@ Shorten is a tiny, speedy URL shortener written in pure Go, using just the stand
 
 ### Installation
 
-It is recommended to use pre-built binaries found in the artifacts. However, you _can_ follow these directions to build from source if you prefer:
-
-1. Install Go ([Directions](https://golang.org/doc/install)).
-2. Clone the repository.
-3. Install the dependencies using `go mod install`.
-4. Build the project using `go build`.
-5. Execute the go binary.
+You can get the appropriate executable for your system by visiting the [Releases](https://github.com/justsharan/shorten/releases) page.
 
 ### API
 
