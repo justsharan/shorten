@@ -1,3 +1,3 @@
-module github.com/sinistrecyborg/shorten
+module github.com/justsharan/shorten
 
-go 1.15
+go 1.17
